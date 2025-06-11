@@ -14,23 +14,106 @@ Le système de transfert PayTech permet de :
 
 ## Services de transfert supportés
 
-### Wave Sénégal
-- **Service ID** : `WAVE_SN_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : 1% du montant transféré
-- **Numéros supportés** : 77xxx xxxx, 78xxx xxxx
+PayTech supporte un large éventail de services de transfert d'argent à travers l'Afrique de l'Ouest :
 
-### Orange Money
+### Sénégal
+- **Orange Money** - Service de mobile money Orange
+- **Wave** - Portefeuille mobile Wave
+- **Tigo Cash** - Service Tigo Cash
+- **Wizall** - Portefeuille mobile Wizall
+- **PayTech** - Transferts internes PayTech
+- **Free Money** - Service Free Money
+- **Emoney** - Portefeuille électronique Emoney
+- **Yup** - Service de paiement Yup
+- **Joni Joni** - Portefeuille mobile Joni Joni
+
+### Côte d'Ivoire
+- **Orange Money CI** - Orange Money Côte d'Ivoire
+- **Wave CI** - Wave Côte d'Ivoire
+- **Mtn Money CI** - MTN Mobile Money Côte d'Ivoire
+- **Moov Money CI** - Moov Money Côte d'Ivoire
+
+### Mali
+- **Orange Money ML** - Orange Money Mali
+- **Moov Money ML** - Moov Money Mali
+
+### Bénin
+- **Moov Money BJ** - Moov Money Bénin
+- **Mtn Money BJ** - MTN Mobile Money Bénin
+
+### Services internationaux
+- **Carte Bancaire** - Transferts par carte bancaire
+- **Wari** - Réseau de transfert Wari
+- **Poste Cash** - Service postal de transfert
+- **PayPal** - Transferts PayPal
+
+### Configuration par service
+
+Chaque service a ses propres spécificités :
+
+#### Orange Money (Sénégal)
 - **Service ID** : `ORANGE_MONEY_SN_API_CASH_IN`
 - **Devise** : XOF (Franc CFA)
 - **Frais** : Variables selon le montant
 - **Numéros supportés** : 77xxx xxxx, 78xxx xxxx
 
-### Tigo Cash
+#### Wave (Sénégal)
+- **Service ID** : `WAVE_SN_API_CASH_IN`
+- **Devise** : XOF (Franc CFA)
+- **Frais** : 1% du montant transféré
+- **Numéros supportés** : 77xxx xxxx, 78xxx xxxx
+
+#### Tigo Cash (Sénégal)
 - **Service ID** : `TIGO_CASH_SN_API_CASH_IN`
 - **Devise** : XOF (Franc CFA)
 - **Frais** : Variables selon le montant
 - **Numéros supportés** : 76xxx xxxx
+
+#### Orange Money CI (Côte d'Ivoire)
+- **Service ID** : `ORANGE_MONEY_CI_API_CASH_IN`
+- **Devise** : XOF (Franc CFA)
+- **Frais** : Variables selon le montant
+- **Numéros supportés** : Numéros ivoiriens
+
+#### MTN Money CI (Côte d'Ivoire)
+- **Service ID** : `MTN_MONEY_CI_API_CASH_IN`
+- **Devise** : XOF (Franc CFA)
+- **Frais** : Variables selon le montant
+- **Numéros supportés** : Numéros MTN CI
+
+#### Wave CI (Côte d'Ivoire)
+- **Service ID** : `WAVE_CI_API_CASH_IN`
+- **Devise** : XOF (Franc CFA)
+- **Frais** : Variables selon le montant
+- **Numéros supportés** : Numéros ivoiriens
+
+### Liste complète des services
+
+```javascript
+const TRANSFER_SERVICES = [
+    'Orange Money',
+    'Orange Money CI',
+    'Orange Money ML',
+    'Mtn Money CI',
+    'Moov Money CI',
+    'Moov Money ML',
+    'Wave',
+    'Wave CI',
+    'Wizall',
+    'PayTech',
+    'Carte Bancaire',
+    'Wari',
+    'Poste Cash',
+    'PayPal',
+    'Emoney',
+    'Tigo Cash',
+    'Yup',
+    'Joni Joni',
+    'Free Money',
+    'Moov Money BJ',
+    'Mtn Money BJ'
+];
+```
 
 ## Demande de transfert
 
