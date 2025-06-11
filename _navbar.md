@@ -7,5 +7,5 @@
   - [🇫🇷 Français](/)
   - [🇬🇧 English](/en/)
 
-- [GitHub](https://github.com/paytech-sn)
+- [GitHub](https://github.com/touskar/docs)
 
