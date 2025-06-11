@@ -10,10 +10,8 @@
 - 🛡️ **Authentification sécurisée** avec clés SHA256 et HMAC
 
 [Commencer](#introduction)
-[GitHub](https://github.com/paytech-sn)
-[Site officiel](https://paytech.sn)
 
-![color](#f0f0f0)
+![color](#135571)
 
 <style>
 .cover-main h1,
