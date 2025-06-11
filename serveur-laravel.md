@@ -1,738 +1,420 @@
-# Intégration Laravel
+# Laravel - Intégration PayTech
 
-Ce guide vous explique comment intégrer PayTech dans vos applications Laravel en utilisant les bonnes pratiques du framework.
+Cette section détaille l'intégration de PayTech dans une application Laravel en utilisant le package officiel open source.
+
+## Package officiel Laravel PayTech
+
+PayTech propose un package Laravel officiel qui simplifie grandement l'intégration. Ce package gère automatiquement les paiements, les notifications IPN, et fournit une interface complète.
+
+**Dépôt GitHub** : [https://github.com/touskar/laravel-paytech](https://github.com/touskar/laravel-paytech)
 
 ## Installation
 
 ### Via Composer
 
+Installez le package via Composer :
+
 ```bash
-composer require guzzlehttp/guzzle
+composer require babaly/laravel-paytech
 ```
 
-### Configuration
+### Configuration du service provider
+
+Ajoutez le service provider dans `config/app.php` :
+
+```php
+return [
+    'providers' => [
+        // ...
+        App\Providers\PaytechServiceProvider::class
+    ]
+];
+```
+
+### Publication des ressources
+
+Vous pouvez publier toutes les ressources en une fois :
+
+```bash
+php artisan vendor:publish --provider="Babaly\LaravelPaytech\LaravelPaytechServiceProvider"
+```
+
+Ou publier sélectivement selon vos besoins :
+
+#### Migrations
+```bash
+php artisan vendor:publish --tag="laravel-paytech-migrations"
+php artisan migrate
+```
+
+#### Configuration
+```bash
+php artisan vendor:publish --tag="laravel-paytech-config"
+```
+
+#### Vues
+```bash
+php artisan vendor:publish --tag="laravel-paytech-views"
+```
+
+#### Services
+```bash
+php artisan vendor:publish --tag="laravel-paytech-services"
+```
+
+#### Modèles
+```bash
+php artisan vendor:publish --tag="laravel-paytech-models"
+```
+
+#### Contrôleurs
+```bash
+php artisan vendor:publish --tag="laravel-paytech-controllers"
+```
+
+## Configuration
+
+### Fichier de configuration
+
+Le package crée automatiquement le fichier `config/paytech.php` :
+
+```php
+return [
+    'PAYTECH_API_KEY' => env('PAYTECH_API_KEY', ''),
+    'PAYTECH_SECRET_KEY' => env('PAYTECH_SECRET_KEY', ''),
+];
+```
+
+### Variables d'environnement
 
 Ajoutez vos clés PayTech dans le fichier `.env` :
 
 ```env
-PAYTECH_API_KEY=votre_api_key
-PAYTECH_SECRET_KEY=votre_secret_key
-PAYTECH_ENV=test
-PAYTECH_IPN_URL=https://votre-site.com/api/paytech/ipn
+# PayTech Configuration
+PAYTECH_API_KEY=votre_api_key_publique
+PAYTECH_SECRET_KEY=votre_api_secret
 ```
 
-Ajoutez la configuration dans `config/services.php` :
+## Utilisation
+
+### Routes automatiques
+
+Le package configure automatiquement les routes suivantes :
 
 ```php
-<?php
+use App\Http\Controllers\PaymentController;
 
-return [
-    // ... autres services
-    
-    'paytech' => [
-        'api_key' => env('PAYTECH_API_KEY'),
-        'secret_key' => env('PAYTECH_SECRET_KEY'),
-        'env' => env('PAYTECH_ENV', 'test'),
-        'base_url' => 'https://paytech.sn/api/payment',
-        'ipn_url' => env('PAYTECH_IPN_URL'),
-        
-        // URLs pour intégrations mobiles (Flutter, React Native)
-        'mobile' => [
-            'success_url' => 'https://paytech.sn/mobile/success',
-            'cancel_url' => 'https://paytech.sn/mobile/cancel',
-        ],
-        
-        // URLs pour intégrations web
-        'web' => [
-            'success_url' => env('APP_URL') . '/payment/success',
-            'cancel_url' => env('APP_URL') . '/payment/cancel',
-        ]
-    ],
-];
+Route::get('payment', [PaymentController::class, 'index'])->name('payment.index');
+Route::post('/checkout', [PaymentController::class, 'payment'])->name('payment.submit');
+Route::get('ipn', [PaymentController::class, 'ipn'])->name('paytech-ipn');
+Route::get('payment-success/{code}', [PaymentController::class, 'success'])->name('payment.success');
+Route::get('payment/{code}/success', [PaymentController::class, 'paymentSuccessView'])->name('payment.success.view');
+Route::get('payment-cancel', [PaymentController::class, 'cancel'])->name('paytech.cancel');
 ```
 
-## Service PayTech
+### Démarrage rapide
 
-Créez un service pour gérer les interactions avec PayTech :
+1. **Lancez votre application** :
+```bash
+php artisan serve
+```
+
+2. **Accédez à la page de paiement** :
+```
+http://127.0.0.1:8000/payment
+```
+
+3. **Testez un paiement** en cliquant sur le bouton de validation
+
+## Interface utilisateur
+
+### Page de paiement
+
+Le package fournit une interface de paiement complète avec :
+
+- **Formulaire de paiement** avec validation
+- **Sélection des méthodes** de paiement PayTech
+- **Préfillage automatique** des informations utilisateur
+- **Interface responsive** pour mobile et desktop
+
+### Redirection PayTech
+
+Après validation, l'utilisateur est redirigé vers la plateforme PayTech avec toutes les méthodes de paiement disponibles.
+
+### Support mobile
+
+Le package supporte les intégrations mobiles avec :
+
+- **URLs spéciales** pour Flutter/React Native
+- **Préfillage automatique** des données utilisateur
+- **Gestion des webviews** mobiles
+- **Callbacks** pour les applications natives
+
+## Fonctionnalités avancées
+
+### Gestion automatique des IPN
+
+Le package gère automatiquement :
+
+- **Réception des notifications** PayTech
+- **Validation des signatures** HMAC et SHA256
+- **Mise à jour des statuts** de commande
+- **Logging** des transactions
+- **Gestion des erreurs** et doublons
+
+### Modes de fonctionnement
+
+#### Mode test (par défaut)
+
+En mode test, PayTech ne débite que 100 FCFA quel que soit le montant de la transaction, permettant de tester l'intégration sans frais réels.
+
+#### Mode production
+
+Pour passer en mode production, utilisez les méthodes du contrôleur :
 
 ```php
-<?php
+// Désactiver le mode test
+$paymentController->setTestMode(false);
 
-namespace App\Services;
-
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Log;
-
-class PayTechService
-{
-    private $client;
-    private $config;
-
-    public function __construct()
-    {
-        $this->client = new Client();
-        $this->config = config('services.paytech');
-    }
-
-    /**
-     * Créer une demande de paiement
-     */
-    public function requestPayment(
-        string $itemName,
-        int $itemPrice,
-        string $refCommand,
-        array $customField = [],
-        ?string $paymentMethod = null,
-        ?object $user = null,
-        bool $isMobile = false
-    ) {
-        $url = $this->config['base_url'] . '/request-payment';
-        
-        // Choisir les URLs selon le type d'intégration
-        $urls = $isMobile ? $this->config['mobile'] : $this->config['web'];
-        
-        $payload = [
-            'item_name' => $itemName,
-            'item_price' => $itemPrice,
-            'currency' => 'xof',
-            'ref_command' => $refCommand,
-            'command_name' => $itemName,
-            'env' => $this->config['env'],
-            'success_url' => $urls['success_url'],
-            'cancel_url' => $urls['cancel_url'],
-            'ipn_url' => $this->config['ipn_url'],
-            'custom_field' => json_encode($customField),
-        ];
-        
-        // Ajouter target_payment si spécifié
-        if ($paymentMethod) {
-            $payload['target_payment'] = $paymentMethod;
-        }
-        
-        $headers = [
-            'API_KEY' => $this->config['api_key'],
-            'API_SECRET' => $this->config['secret_key'],
-            'Content-Type' => 'application/json'
-        ];
-        
-        try {
-            $response = $this->client->post($url, [
-                'json' => $payload,
-                'headers' => $headers
-            ]);
-            
-            $statusCode = $response->getStatusCode();
-            $responseData = json_decode($response->getBody(), true);
-            
-            if (in_array($statusCode, [200, 201])) {
-                // Ajouter les paramètres de préfillage si utilisateur fourni
-                if ($user && $isMobile) {
-                    $queryParams = [
-                        'pn' => $user->phone_number,
-                        'nn' => substr($user->phone_number, 4), // Numéro national
-                        'fn' => $user->first_name . ' ' . $user->last_name,
-                        'tp' => $paymentMethod,
-                        'nac' => 1 // Auto-submit
-                    ];
-                    
-                    $queryString = http_build_query($queryParams);
-                    $responseData['redirect_url'] .= '?' . $queryString;
-                    $responseData['redirectUrl'] = $responseData['redirect_url'];
-                }
-                
-                return [
-                    'success' => true,
-                    'data' => $responseData
-                ];
-            }
-            
-            return [
-                'success' => false,
-                'errors' => [$statusCode]
-            ];
-            
-        } catch (RequestException $e) {
-            Log::error('PayTech API Error', [
-                'message' => $e->getMessage(),
-                'response' => $e->getResponse() ? $e->getResponse()->getBody()->getContents() : null
-            ]);
-            
-            return [
-                'success' => false,
-                'errors' => [$e->getMessage()]
-            ];
-        }
-    }
-    
-    /**
-     * Valider une notification IPN
-     */
-    public function validateIPN(array $data): bool
-    {
-        $receivedApiKeyHash = $data['api_key_sha256'] ?? '';
-        $receivedSecretHash = $data['api_secret_sha256'] ?? '';
-        
-        $expectedApiKeyHash = hash('sha256', $this->config['api_key']);
-        $expectedSecretHash = hash('sha256', $this->config['secret_key']);
-        
-        return $receivedApiKeyHash === $expectedApiKeyHash && 
-               $receivedSecretHash === $expectedSecretHash;
-    }
-    
-    /**
-     * Valider une signature HMAC
-     */
-    public function validateHMAC(array $data): bool
-    {
-        if (!isset($data['hmac_compute'])) {
-            return false;
-        }
-        
-        $receivedHmac = $data['hmac_compute'];
-        
-        // Reconstituer le message pour la vérification HMAC
-        $message = $data['amount'] . '|' . $data['id_transaction'] . '|' . $this->config['api_key'];
-        $expectedHmac = hash_hmac('sha256', $message, $this->config['secret_key']);
-        
-        return hash_equals($expectedHmac, $receivedHmac);
-    }
-}
+// Ou activer le mode live directement
+$paymentController->setLiveMode(true);
 ```
 
-## Modèle Transaction
+### Personnalisation
 
-Créez un modèle pour gérer les transactions :
+#### Contrôleur personnalisé
 
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-
-class Transaction extends Model
-{
-    use HasFactory;
-
-    protected $fillable = [
-        'ref_command',
-        'token',
-        'amount',
-        'currency',
-        'status',
-        'payment_method',
-        'custom_field',
-        'user_id',
-        'paytech_data'
-    ];
-
-    protected $casts = [
-        'custom_field' => 'array',
-        'paytech_data' => 'array',
-        'amount' => 'integer'
-    ];
-
-    const STATUS_PENDING = 'pending';
-    const STATUS_COMPLETED = 'completed';
-    const STATUS_CANCELLED = 'cancelled';
-    const STATUS_FAILED = 'failed';
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    
-    public function scopePending($query)
-    {
-        return $query->where('status', self::STATUS_PENDING);
-    }
-    
-    public function scopeCompleted($query)
-    {
-        return $query->where('status', self::STATUS_COMPLETED);
-    }
-    
-    public function markAsCompleted()
-    {
-        $this->update(['status' => self::STATUS_COMPLETED]);
-    }
-    
-    public function markAsCancelled()
-    {
-        $this->update(['status' => self::STATUS_CANCELLED]);
-    }
-}
-```
-
-## Migration
-
-```php
-<?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-class CreateTransactionsTable extends Migration
-{
-    public function up()
-    {
-        Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
-            $table->string('ref_command')->unique();
-            $table->string('token')->nullable();
-            $table->integer('amount');
-            $table->string('currency', 3)->default('xof');
-            $table->enum('status', ['pending', 'completed', 'cancelled', 'failed'])
-                  ->default('pending');
-            $table->string('payment_method')->nullable();
-            $table->json('custom_field')->nullable();
-            $table->json('paytech_data')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
-            $table->timestamps();
-            
-            $table->index(['status', 'created_at']);
-            $table->index('ref_command');
-        });
-    }
-
-    public function down()
-    {
-        Schema::dropIfExists('transactions');
-    }
-}
-```
-
-## Contrôleur
+Vous pouvez étendre le contrôleur de base pour ajouter vos propres fonctionnalités :
 
 ```php
 <?php
 
 namespace App\Http\Controllers;
 
-use App\Models\Transaction;
-use App\Services\PayTechService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
+use Babaly\LaravelPaytech\Http\Controllers\PaymentController as BasePaymentController;
 
-class PaymentController extends Controller
+class CustomPaymentController extends BasePaymentController
 {
-    private $payTechService;
-
-    public function __construct(PayTechService $payTechService)
-    {
-        $this->payTechService = $payTechService;
-    }
-
     /**
-     * Créer un paiement (Web)
+     * Logique personnalisée après paiement réussi
      */
-    public function createPayment(Request $request)
+    protected function onPaymentSuccess($transaction)
     {
-        $request->validate([
-            'item_name' => 'required|string|max:255',
-            'item_price' => 'required|integer|min:1',
-            'payment_method' => 'nullable|string',
-            'custom_field' => 'nullable|array'
-        ]);
-
-        $user = Auth::user();
-        $refCommand = 'CMD_' . Str::random(10);
-
-        // Créer la transaction en base
-        $transaction = Transaction::create([
-            'ref_command' => $refCommand,
-            'amount' => $request->item_price,
-            'payment_method' => $request->payment_method,
-            'custom_field' => $request->custom_field ?? [],
-            'user_id' => $user->id ?? null,
-            'status' => Transaction::STATUS_PENDING
-        ]);
-
-        // Appeler PayTech
-        $result = $this->payTechService->requestPayment(
-            $request->item_name,
-            $request->item_price,
-            $refCommand,
-            $request->custom_field ?? [],
-            $request->payment_method,
-            $user,
-            false // Web integration
-        );
-
-        if ($result['success']) {
-            // Sauvegarder les données PayTech
-            $transaction->update([
-                'token' => $result['data']['token'],
-                'paytech_data' => $result['data']
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'redirect_url' => $result['data']['redirect_url'],
-                'token' => $result['data']['token']
-            ]);
-        }
-
-        $transaction->markAsFailed();
+        // Envoyer un email de confirmation
+        // Mettre à jour les stocks
+        // Déclencher des webhooks
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur lors de la création du paiement',
-            'errors' => $result['errors']
-        ], 400);
+        parent::onPaymentSuccess($transaction);
     }
 
     /**
-     * Créer un paiement (Mobile/Flutter)
+     * Logique personnalisée après échec de paiement
      */
-    public function createMobilePayment(Request $request)
+    protected function onPaymentFailure($transaction)
     {
-        $request->validate([
-            'item_name' => 'required|string|max:255',
-            'item_price' => 'required|integer|min:1',
-            'payment_method' => 'nullable|string',
-            'custom_field' => 'nullable|array',
-            'user_phone' => 'required|string',
-            'user_name' => 'required|string'
-        ]);
-
-        $refCommand = 'MOBILE_' . Str::random(10);
-
-        // Créer un objet utilisateur temporaire pour le préfillage
-        $user = (object) [
-            'phone_number' => $request->user_phone,
-            'first_name' => explode(' ', $request->user_name)[0],
-            'last_name' => explode(' ', $request->user_name)[1] ?? ''
-        ];
-
-        // Créer la transaction
-        $transaction = Transaction::create([
-            'ref_command' => $refCommand,
-            'amount' => $request->item_price,
-            'payment_method' => $request->payment_method,
-            'custom_field' => $request->custom_field ?? [],
-            'status' => Transaction::STATUS_PENDING
-        ]);
-
-        // Appeler PayTech avec intégration mobile
-        $result = $this->payTechService->requestPayment(
-            $request->item_name,
-            $request->item_price,
-            $refCommand,
-            $request->custom_field ?? [],
-            $request->payment_method,
-            $user,
-            true // Mobile integration
-        );
-
-        if ($result['success']) {
-            $transaction->update([
-                'token' => $result['data']['token'],
-                'paytech_data' => $result['data']
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'redirect_url' => $result['data']['redirect_url'],
-                'token' => $result['data']['token']
-            ]);
-        }
-
-        $transaction->markAsFailed();
+        // Logger l'échec
+        // Notifier l'administrateur
+        // Proposer des alternatives
         
-        return response()->json([
-            'success' => false,
-            'message' => 'Erreur lors de la création du paiement mobile',
-            'errors' => $result['errors']
-        ], 400);
-    }
-
-    /**
-     * Traiter les notifications IPN
-     */
-    public function handleIPN(Request $request)
-    {
-        try {
-            $data = $request->all();
-            
-            Log::info('IPN reçu', $data);
-
-            // Validation de l'IPN (choisir une méthode)
-            $isValid = $this->payTechService->validateIPN($data) || 
-                      $this->payTechService->validateHMAC($data);
-
-            if (!$isValid) {
-                Log::warning('IPN invalide', $data);
-                return response('Invalid IPN', 400);
-            }
-
-            // Trouver la transaction
-            $transaction = Transaction::where('ref_command', $data['ref_command'])->first();
-
-            if (!$transaction) {
-                Log::warning('Transaction non trouvée', ['ref_command' => $data['ref_command']]);
-                return response('Transaction not found', 404);
-            }
-
-            // Traiter selon le type d'événement
-            switch ($data['type_event']) {
-                case 'sale_complete':
-                    $transaction->markAsCompleted();
-                    Log::info('Paiement confirmé', ['ref_command' => $data['ref_command']]);
-                    break;
-
-                case 'sale_cancel':
-                    $transaction->markAsCancelled();
-                    Log::info('Paiement annulé', ['ref_command' => $data['ref_command']]);
-                    break;
-
-                default:
-                    Log::info('Événement non géré', ['type_event' => $data['type_event']]);
-            }
-
-            return response('OK', 200);
-
-        } catch (\Exception $e) {
-            Log::error('Erreur IPN', [
-                'message' => $e->getMessage(),
-                'data' => $request->all()
-            ]);
-            
-            return response('Error', 500);
-        }
-    }
-
-    /**
-     * Page de succès
-     */
-    public function success(Request $request)
-    {
-        $token = $request->query('token');
-        $refCommand = $request->query('ref_command');
-
-        $transaction = Transaction::where('ref_command', $refCommand)->first();
-
-        return view('payment.success', compact('transaction', 'token'));
-    }
-
-    /**
-     * Page d'annulation
-     */
-    public function cancel(Request $request)
-    {
-        $token = $request->query('token');
-        $refCommand = $request->query('ref_command');
-
-        $transaction = Transaction::where('ref_command', $refCommand)->first();
-
-        return view('payment.cancel', compact('transaction', 'token'));
+        parent::onPaymentFailure($transaction);
     }
 }
 ```
 
-## Routes
+#### Configuration avancée
+
+Étendez la configuration dans `config/paytech.php` :
 
 ```php
-<?php
+return [
+    'PAYTECH_API_KEY' => env('PAYTECH_API_KEY', ''),
+    'PAYTECH_SECRET_KEY' => env('PAYTECH_SECRET_KEY', ''),
+    
+    // Configuration personnalisée
+    'currency' => env('PAYTECH_CURRENCY', 'XOF'),
+    'environment' => env('PAYTECH_ENV', 'test'),
+    'timeout' => env('PAYTECH_TIMEOUT', 30),
+    
+    'urls' => [
+        'success' => env('PAYTECH_SUCCESS_URL'),
+        'cancel' => env('PAYTECH_CANCEL_URL'),
+        'ipn' => env('PAYTECH_IPN_URL'),
+    ],
+    
+    'mobile' => [
+        'success_url' => 'https://paytech.sn/mobile/success',
+        'cancel_url' => 'https://paytech.sn/mobile/cancel',
+    ],
+    
+    'payment_methods' => [
+        'Orange Money',
+        'Tigo Cash',
+        'Wave',
+        'PayExpresse',
+        'Carte Bancaire',
+        'Wari',
+        'Poste Cash',
+        'PayPal',
+        'Emoney',
+        'Joni Joni'
+    ],
+];
+```
 
-use App\Http\Controllers\PaymentController;
-use Illuminate\Support\Facades\Route;
+## Intégration avec préfillage
 
-// Routes API
-Route::prefix('api')->group(function () {
-    Route::post('/payment/create', [PaymentController::class, 'createPayment']);
-    Route::post('/payment/mobile/create', [PaymentController::class, 'createMobilePayment']);
-    Route::post('/paytech/ipn', [PaymentController::class, 'handleIPN']);
+### Préfillage utilisateur automatique
+
+Le package supporte le préfillage automatique des informations utilisateur :
+
+```php
+// Dans votre contrôleur
+public function initiatePayment(Request $request)
+{
+    $paymentData = [
+        'item_name' => 'iPhone 13 Pro',
+        'item_price' => 650000,
+        'ref_command' => 'CMD_' . time(),
+        
+        // Données utilisateur pour préfillage
+        'user' => [
+            'phone_number' => '+221771234567',
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'auto_submit' => true
+        ],
+        
+        // Méthode de paiement ciblée (optionnel)
+        'payment_method' => 'Orange Money',
+        
+        // Données personnalisées
+        'custom_field' => [
+            'user_id' => auth()->id(),
+            'source' => 'laravel_app'
+        ]
+    ];
+    
+    return $this->processPayment($paymentData);
+}
+```
+
+### Paramètres de redirection
+
+Le package ajoute automatiquement les paramètres de préfillage à l'URL de redirection :
+
+- `pn` : Numéro complet avec indicatif (+221771234567)
+- `nn` : Numéro national (771234567)
+- `fn` : Nom complet (John Doe)
+- `tp` : Méthode de paiement ciblée
+- `nac` : Auto-submit (1=oui, 0=non)
+
+## API et webhooks
+
+### Endpoints disponibles
+
+Le package expose plusieurs endpoints :
+
+```php
+// Vérifier le statut d'une transaction
+GET /api/paytech/transaction/{ref_command}/status
+
+// Relancer une notification IPN
+POST /api/paytech/transaction/{ref_command}/retry-ipn
+
+// Obtenir l'historique des transactions
+GET /api/paytech/transactions?user_id={id}
+```
+
+### Événements Laravel
+
+Le package déclenche des événements Laravel :
+
+```php
+// Écouter les événements de paiement
+Event::listen('paytech.payment.success', function ($transaction) {
+    // Logique après paiement réussi
 });
 
-// Routes Web
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-Route::get('/payment/cancel', [PaymentController::class, 'cancel'])->name('payment.cancel');
+Event::listen('paytech.payment.failed', function ($transaction) {
+    // Logique après échec de paiement
+});
+
+Event::listen('paytech.ipn.received', function ($ipnData) {
+    // Logique après réception IPN
+});
 ```
 
-## Middleware CSRF
+## Tests et débogage
 
-Pour l'endpoint IPN, désactivez la vérification CSRF dans `app/Http/Middleware/VerifyCsrfToken.php` :
+### Mode test
 
-```php
-<?php
+Le package est configuré en mode test par défaut. En mode test :
 
-namespace App\Http\Middleware;
+- Seuls 100 FCFA sont débités quel que soit le montant
+- Toutes les méthodes de paiement sont disponibles
+- Les notifications IPN fonctionnent normalement
 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+### Logs
 
-class VerifyCsrfToken extends Middleware
-{
-    protected $except = [
-        'api/paytech/ipn'
-    ];
-}
+Le package log automatiquement :
+
+- Toutes les demandes de paiement
+- Les réponses de l'API PayTech
+- Les notifications IPN reçues
+- Les erreurs et exceptions
+
+Consultez les logs dans `storage/logs/laravel.log`.
+
+### Commandes Artisan
+
+Le package fournit des commandes utiles :
+
+```bash
+# Vérifier la configuration PayTech
+php artisan paytech:config
+
+# Tester la connectivité API
+php artisan paytech:test-connection
+
+# Nettoyer les transactions expirées
+php artisan paytech:cleanup-transactions
+
+# Synchroniser les statuts avec PayTech
+php artisan paytech:sync-transactions
 ```
 
-## Vues Blade
+## Migration vers la production
 
-### resources/views/payment/success.blade.php
+### Checklist de production
 
-```blade
-@extends('layouts.app')
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h4>Paiement réussi !</h4>
-                </div>
-                <div class="card-body">
-                    @if($transaction)
-                        <p><strong>Référence :</strong> {{ $transaction->ref_command }}</p>
-                        <p><strong>Montant :</strong> {{ number_format($transaction->amount) }} XOF</p>
-                        <p><strong>Statut :</strong> {{ ucfirst($transaction->status) }}</p>
-                    @endif
-                    
-                    <a href="{{ route('home') }}" class="btn btn-primary">
-                        Retour à l'accueil
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@endsection
-```
-
-## Tests
-
-```php
-<?php
-
-namespace Tests\Feature;
-
-use App\Models\Transaction;
-use App\Services\PayTechService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-class PaymentTest extends TestCase
-{
-    use RefreshDatabase;
-
-    public function test_can_create_payment()
-    {
-        $response = $this->postJson('/api/payment/create', [
-            'item_name' => 'Test Product',
-            'item_price' => 1000,
-            'payment_method' => 'Orange Money'
-        ]);
-
-        $response->assertStatus(200)
-                ->assertJsonStructure([
-                    'success',
-                    'redirect_url',
-                    'token'
-                ]);
-
-        $this->assertDatabaseHas('transactions', [
-            'amount' => 1000,
-            'status' => Transaction::STATUS_PENDING
-        ]);
-    }
-
-    public function test_can_handle_ipn()
-    {
-        $transaction = Transaction::factory()->create([
-            'ref_command' => 'TEST_001',
-            'status' => Transaction::STATUS_PENDING
-        ]);
-
-        $ipnData = [
-            'type_event' => 'sale_complete',
-            'ref_command' => 'TEST_001',
-            'api_key_sha256' => hash('sha256', config('services.paytech.api_key')),
-            'api_secret_sha256' => hash('sha256', config('services.paytech.secret_key'))
-        ];
-
-        $response = $this->post('/api/paytech/ipn', $ipnData);
-
-        $response->assertStatus(200);
-        
-        $transaction->refresh();
-        $this->assertEquals(Transaction::STATUS_COMPLETED, $transaction->status);
-    }
-}
-```
-
-## Commandes Artisan
-
-Créez une commande pour vérifier les transactions en attente :
-
-```php
-<?php
-
-namespace App\Console\Commands;
-
-use App\Models\Transaction;
-use Illuminate\Console\Command;
-
-class CheckPendingTransactions extends Command
-{
-    protected $signature = 'paytech:check-pending';
-    protected $description = 'Vérifier les transactions en attente';
-
-    public function handle()
-    {
-        $pendingTransactions = Transaction::pending()
-            ->where('created_at', '<', now()->subHours(2))
-            ->get();
-
-        foreach ($pendingTransactions as $transaction) {
-            $this->info("Transaction en attente: {$transaction->ref_command}");
-            // Logique pour vérifier le statut ou marquer comme expirée
-        }
-
-        $this->info("Vérification terminée. {$pendingTransactions->count()} transactions trouvées.");
-    }
-}
-```
-
-## Configuration pour la production
-
-### Variables d'environnement
-
+1. **Obtenir les clés de production** depuis votre dashboard PayTech
+2. **Mettre à jour les variables d'environnement** :
 ```env
-PAYTECH_API_KEY=votre_vraie_api_key
-PAYTECH_SECRET_KEY=votre_vraie_secret_key
-PAYTECH_ENV=prod
-PAYTECH_IPN_URL=https://votre-domaine.com/api/paytech/ipn
+PAYTECH_API_KEY=votre_cle_production
+PAYTECH_SECRET_KEY=votre_secret_production
 ```
-
-### Optimisations
-
+3. **Désactiver le mode test** dans votre code :
 ```php
-// Dans AppServiceProvider
-public function boot()
-{
-    // Cache la configuration PayTech
-    if ($this->app->environment('production')) {
-        config(['services.paytech' => cache()->remember(
-            'paytech.config',
-            3600,
-            fn() => config('services.paytech')
-        )]);
-    }
-}
+$paymentController->setLiveMode(true);
 ```
+4. **Configurer les URLs de production** pour IPN et callbacks
+5. **Tester avec de petits montants** avant le lancement
+6. **Configurer le monitoring** et les alertes
 
-## Ressources supplémentaires
+### Sécurité en production
 
-- [Documentation Laravel](https://laravel.com/docs)
-- [Guzzle HTTP Client](https://docs.guzzlephp.org/)
-- [Laravel Testing](https://laravel.com/docs/testing)
-- [Support PayTech](mailto:support@paytech.sn)
+- Utilisez HTTPS pour toutes les URLs
+- Configurez des timeouts appropriés
+- Implémentez un rate limiting
+- Surveillez les logs d'erreur
+- Sauvegardez régulièrement les données de transaction
+
+## Support et documentation
+
+- **Documentation officielle** : [https://doc.paytech.sn/](https://doc.paytech.sn/)
+- **Dépôt GitHub** : [https://github.com/touskar/laravel-paytech](https://github.com/touskar/laravel-paytech)
+- **Issues et bugs** : Reportez sur GitHub
+- **Support PayTech** : support@paytech.sn
+
+Le package Laravel PayTech officiel simplifie considérablement l'intégration en fournissant une solution clé en main avec toutes les fonctionnalités nécessaires pour accepter des paiements PayTech dans vos applications Laravel.
 
