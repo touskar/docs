@@ -18,6 +18,7 @@
 - **Intégration côté serveur**
   - [Node.js](serveur-nodejs.md)
   - [PHP](serveur-php.md)
+  - [Laravel](serveur-laravel.md)
   - [Python](serveur-python.md)
   - [Python avancé](python-avance.md)
   - [Java](serveur-java.md)
