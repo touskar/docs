@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#0084bf</color>
+    <color name="colorPrimaryDark">#016bbc</color>
+    <color name="white">#FFFFFF</color>
+    <dimen name="activity_vertical_margin">56dp</dimen>
+    <string name="app_name">PayTech-SDK</string>
+    <style name="BaseBottomSheetDialog" parent="@style/Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsFloating">false</item>
+        <item name="bottomSheetStyle">@style/BottomSheet</item>
+    </style>
+    <style name="BottomSheet" parent="@style/Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@drawable/rounded_dialog</item>
+    </style>
+    <style name="BottomSheetDialogTheme" parent="BaseBottomSheetDialog"/>
+</resources>

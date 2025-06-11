@@ -1,0 +1,10 @@
+{
+    "articles": [
+        {
+            "id": 1,
+            "name": "Achat chaise sur site démop",
+            "currency": "XOF",
+            "stock": 555555
+        }
+    ]
+}

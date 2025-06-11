@@ -1,0 +1,14 @@
+HTTrack3.49-2 launched on Tue, 09 Feb 2021 12:57:04 at http://ledthanhdat.vn/html/furgan/index.html
+(httrack http://ledthanhdat.vn/html/furgan/index.html )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+13:08:11	Warning: 	Moved Permanently for ledthanhdat.vn/html/furgan/my-account.htmllost-password/
+13:08:11	Warning: 	Redirected link is identical because of 'URL Hack' option: ledthanhdat.vn/html/furgan/my-account.htmllost-password/ and https://ledthanhdat.vn/html/furgan/my-account.htmllost-password/
+13:08:11	Warning: 	File has moved from ledthanhdat.vn/html/furgan/my-account.htmllost-password/ to https://ledthanhdat.vn/html/furgan/my-account.htmllost-password/
+
+HTTrack Website Copier/3.49-2 mirror complete in 11 minutes 26 seconds : 310 links scanned, 308 files written (16108807 bytes overall) [16186002 bytes received at 23594 bytes/sec], 20 bytes transferred using HTTP compression in 4 files, ratio 400%, 2.5 requests per connection
+(No errors, 3 warnings, 0 messages)

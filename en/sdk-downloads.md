@@ -10,31 +10,31 @@ All files are available and maintained by the PayTech team. They are regularly u
 
 #### WordPress - WooCommerce
 - **Version**: PayTech 6.0.3
-- **Last Update**: April 07, 2025 12:02 PM
-- **Support**: WooCommerce update support
-- **Download**: [paytech_woocommerce.zip](https://doc.paytech.sn/downloads/sdk/woocomerce/paytech_woocommerce.zip?v=6.0.3)
+- **Last update**: April 07, 2025 12:02 PM
+- **Support**: WooCommerce update
+- **Download**: [paytech_woocommerce.zip](/downloads/sdk/woocomerce/paytech_woocommerce.zip?v=6.0.3)
 
 #### Drupal Commerce
 - **Version**: 5.0.0
-- **Download**: [commerce_paytech.zip](https://doc.paytech.sn/downloads/sdk/drupal/commerce_paytech.zip?v=5.0.0)
+- **Download**: [commerce_paytech.zip](/downloads/sdk/drupal/commerce_paytech.zip?v=5.0.0)
 
 #### PrestaShop
 - **Version**: 1.0
-- **Download**: [paytech.zip](https://doc.paytech.sn/downloads/sdk/prestashop/paytech.zip?v=1)
+- **Download**: [paytech.zip](/downloads/sdk/prestashop/paytech.zip?v=1)
 
-### 💻 Server SDKs
+### 💻 Server SDK
 
 #### PHP
 - **Description**: Complete PHP SDK for server integration
-- **Download**: [paytech_php.zip](https://doc.paytech.sn/downloads/sdk/paytech_php.zip)
+- **Download**: [paytech_php.zip](/downloads/sdk/paytech_php.zip)
 - **Usage**: Server-side integration, payment and IPN management
 
-### 📱 Mobile SDKs
+### 📱 Mobile SDK
 
 #### Android
-- **Description**: Library & Android test project
-- **Download**: [paytech_android.zip](https://doc.paytech.sn/downloads/sdk/paytech_android.zip)
-- **Contents**: 
+- **Description**: Android Library & Test Project
+- **Download**: [paytech_android.zip](/downloads/sdk/paytech_android.zip)
+- **Content**: 
   - PayTech Android library (.aar)
   - Complete example project
   - Integration documentation
@@ -46,9 +46,9 @@ All files are available and maintained by the PayTech team. They are regularly u
 
 ### 🧪 Testing Tools
 
-#### Demo Store
+#### Demo Shop
 - **Description**: Complete test application
-- **Download**: [shop_test.zip](https://doc.paytech.sn/downloads/sdk/shop_test.zip)
+- **Download**: [shop_test.zip](/downloads/sdk/shop_test.zip)
 - **Usage**: Integration testing, implementation examples
 
 ## 📋 Installation Guide

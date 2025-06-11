@@ -1,0 +1,18 @@
+R_DEF: Internal format may change without notice
+local
+anim slide_in_up
+anim slide_out_up
+color colorAccent
+color colorPrimary
+color colorPrimaryDark
+color white
+dimen activity_vertical_margin
+drawable rounded_dialog
+drawable rounded_top_layout
+id webview
+layout activity_main
+layout roundedwebview
+string app_name
+style BaseBottomSheetDialog
+style BottomSheet
+style BottomSheetDialogTheme

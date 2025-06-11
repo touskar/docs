@@ -1,0 +1,1 @@
+ zip -r  paytech_woocommerce.zip paytech_woocommerce/

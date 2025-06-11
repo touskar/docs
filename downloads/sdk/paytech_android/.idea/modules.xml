@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/paytech_android.iml" filepath="$PROJECT_DIR$/paytech_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/paytech_android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/paytech_android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/paytech-sdk/paytech_android.paytech-sdk.iml" filepath="$PROJECT_DIR$/.idea/modules/paytech-sdk/paytech_android.paytech-sdk.iml" />
+    </modules>
+  </component>
+</project>

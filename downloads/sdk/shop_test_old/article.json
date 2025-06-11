@@ -1,0 +1,249 @@
+{
+    "articles": [
+        {
+            "id": 1,
+            "name": "Spice Food",
+            "price": 100,
+            "currency": "XOF",
+            "stock": 555555
+        },
+        {
+            "id": 2,
+            "name": "Sciurus vulgaris",
+            "price": 32,
+            "currency": "EUR",
+            "stock": 100
+        },
+        {
+            "id": 3,
+            "name": "Amphibolurus barbatus",
+            "price": 96,
+            "currency": "GBP",
+            "stock": 100
+        },
+        {
+            "id": 4,
+            "name": "Geochelone elegans",
+            "price": 426030,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 5,
+            "name": "Motacilla aguimp",
+            "price": 77,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 6,
+            "name": "Bubalus arnee",
+            "price": 271,
+            "currency": "USD",
+            "stock": 99
+        },
+        {
+            "id": 7,
+            "name": "Pycnonotus nigricans",
+            "price": 37,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 8,
+            "name": "Laniaurius atrococcineus",
+            "price": 41,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 9,
+            "name": "Ateles paniscus",
+            "price": 195,
+            "currency": "MAD",
+            "stock": 100
+        },
+        {
+            "id": 10,
+            "name": "Tachyglossus aculeatus",
+            "price": 302093,
+            "currency": "MAD",
+            "stock": 100
+        },
+        {
+            "id": 11,
+            "name": "Vulpes vulpes",
+            "price": 25,
+            "currency": "USD",
+            "stock": 100
+        },
+        {
+            "id": 12,
+            "name": "Tachyglossus aculeatus",
+            "price": 690000,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 13,
+            "name": "Priodontes maximus",
+            "price": 59,
+            "currency": "USD",
+            "stock": 100
+        },
+        {
+            "id": 14,
+            "name": "Cabassous sp.",
+            "price": 253025,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 15,
+            "name": "Caiman crocodilus",
+            "price": 69,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 16,
+            "name": "Microcebus murinus",
+            "price": 220000,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 17,
+            "name": "Geochelone elegans",
+            "price": 19,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 18,
+            "name": "Spermophilus tridecemlineatus",
+            "price": 51,
+            "currency": "GBP",
+            "stock": 100
+        },
+        {
+            "id": 19,
+            "name": "Pycnonotus nigricans",
+            "price": 427780,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 20,
+            "name": "Paradoxurus hermaphroditus",
+            "price": 458,
+            "currency": "USD",
+            "stock": 100
+        },
+        {
+            "id": 21,
+            "name": "Felis chaus",
+            "price": 48,
+            "currency": "GBP",
+            "stock": 100
+        },
+        {
+            "id": 22,
+            "name": "Procyon lotor",
+            "price": 442680,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 23,
+            "name": "Sarkidornis melanotos",
+            "price": 98680,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 24,
+            "name": "Mephitis mephitis",
+            "price": 159040,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 25,
+            "name": "Libellula quadrimaculata",
+            "price": 332,
+            "currency": "MAD",
+            "stock": 100
+        },
+        {
+            "id": 26,
+            "name": "Zosterops pallidus",
+            "price": 448,
+            "currency": "MAD",
+            "stock": 100
+        },
+        {
+            "id": 27,
+            "name": "Capreolus capreolus",
+            "price": 289173,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 28,
+            "name": "Globicephala melas",
+            "price": 9,
+            "currency": "USD",
+            "stock": 100
+        },
+        {
+            "id": 29,
+            "name": "Cercatetus concinnus",
+            "price": 131,
+            "currency": "CAD",
+            "stock": 100
+        },
+        {
+            "id": 30,
+            "name": "Procyon lotor",
+            "price": 639,
+            "currency": "MAD",
+            "stock": 100
+        },
+        {
+            "id": 31,
+            "name": "Phoenicopterus GBPer",
+            "price": 481000,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 32,
+            "name": "Spermophilus lateralis",
+            "price": 483,
+            "currency": "GBP",
+            "stock": 100
+        },
+        {
+            "id": 33,
+            "name": "Paroaria gularis",
+            "price": 4940,
+            "currency": "MAD",
+            "stock": 100
+        },
+        {
+            "id": 34,
+            "name": "Colobus guerza",
+            "price": 13560,
+            "currency": "XOF",
+            "stock": 100
+        },
+        {
+            "id": 35,
+            "name": "Pelecanus occidentalis",
+            "price": 228550,
+            "currency": "XOF",
+            "stock": 100
+        }
+    ]
+}

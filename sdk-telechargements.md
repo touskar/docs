@@ -12,28 +12,28 @@ Tous les fichiers sont disponibles et maintenus par l'équipe PayTech. Ils sont 
 - **Version** : PayTech 6.0.3
 - **Dernière mise à jour** : 07 Avril 2025 12H02
 - **Support** : Mise à jour WooCommerce
-- **Téléchargement** : [paytech_woocommerce.zip](https://doc.paytech.sn/downloads/sdk/woocomerce/paytech_woocommerce.zip?v=6.0.3)
+- **Téléchargement** : [paytech_woocommerce.zip](/downloads/sdk/woocomerce/paytech_woocommerce.zip?v=6.0.3)
 
 #### Drupal Commerce
 - **Version** : 5.0.0
-- **Téléchargement** : [commerce_paytech.zip](https://doc.paytech.sn/downloads/sdk/drupal/commerce_paytech.zip?v=5.0.0)
+- **Téléchargement** : [commerce_paytech.zip](/downloads/sdk/drupal/commerce_paytech.zip?v=5.0.0)
 
 #### PrestaShop
 - **Version** : 1.0
-- **Téléchargement** : [paytech.zip](https://doc.paytech.sn/downloads/sdk/prestashop/paytech.zip?v=1)
+- **Téléchargement** : [paytech.zip](/downloads/sdk/prestashop/paytech.zip?v=1)
 
 ### 💻 SDK Serveur
 
 #### PHP
 - **Description** : SDK PHP complet pour intégration serveur
-- **Téléchargement** : [paytech_php.zip](https://doc.paytech.sn/downloads/sdk/paytech_php.zip)
+- **Téléchargement** : [paytech_php.zip](/downloads/sdk/paytech_php.zip)
 - **Utilisation** : Intégration côté serveur, gestion des paiements et IPN
 
 ### 📱 SDK Mobile
 
 #### Android
 - **Description** : Library & Projet test Android
-- **Téléchargement** : [paytech_android.zip](https://doc.paytech.sn/downloads/sdk/paytech_android.zip)
+- **Téléchargement** : [paytech_android.zip](/downloads/sdk/paytech_android.zip)
 - **Contenu** : 
   - Bibliothèque PayTech Android (.aar)
   - Projet d'exemple complet
@@ -48,7 +48,7 @@ Tous les fichiers sont disponibles et maintenus par l'équipe PayTech. Ils sont 
 
 #### Boutique de démonstration
 - **Description** : Application de test complète
-- **Téléchargement** : [shop_test.zip](https://doc.paytech.sn/downloads/sdk/shop_test.zip)
+- **Téléchargement** : [shop_test.zip](/downloads/sdk/shop_test.zip)
 - **Utilisation** : Test des intégrations, exemples d'implémentation
 
 ## 📋 Guide d'installation

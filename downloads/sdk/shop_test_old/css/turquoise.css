@@ -1,0 +1,86 @@
+/*====================================
+=            COLOR blue            =
+====================================*/
+/*
+blue
+29D2E4
+18b1c2
+*/
+
+
+.bg-shop {
+	background-color: #29D2E4;
+}
+
+a {
+	color: #29D2E4;
+}
+a:hover {
+	color: #18b1c2;
+
+}
+
+#hero .hero-start-link:hover,
+#hero .hero-start-link:focus:hover {
+	color: #29D2E4;
+}
+
+.color-text {
+	color: #29D2E4;
+}
+.btn {
+	background: #29D2E4;
+	-webkit-box-shadow: 0 4px 0 #18b1c2;
+	-moz-box-shadow: 0 4px 0 #18b1c2;
+	box-shadow: 0 4px 0 #18b1c2;
+}
+
+.numbers-1 h2 {
+	color: #29D2E4;
+}
+.features-1 article .zoom-img {
+	border: 6px solid #29D2E4;
+}
+
+.back-to-top {
+	background: #29D2E4;
+}
+
+.social-links-2 li a:hover {
+	color: #202020;
+	background:#29D2E4;
+	border-color: #29D2E4;
+}
+#menu-link:hover .menu-icon{
+	background-color: #29D2E4;
+}
+#menu-link.is-clicked{
+	background-color: #29D2E4;
+}
+.myform .form-control:focus,
+.myform textarea.inputError:focus,
+.input-group .form-control:focus {
+	border: 2px solid #29D2E4;
+}
+.hero-start-link:hover {
+	color:#29D2E4;
+}
+.overlay nav ul li a:after {
+	background: #29D2E4;
+}
+.close-modal:hover {
+	background-color: #29D2E4;
+}
+.zoom-img  {
+	border: 6px solid #29D2E4;
+}
+
+.bg-image-2 {
+	background-color: #29D2E4;
+}
+.footer-1 .back-to-top {
+	background: #29D2E4;
+}
+/*-----  End of COLOR blue  ------*/
+
+

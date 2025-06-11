@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "/Users/macbookretina/PhpstormProjects/docs/downloads/sdk/paytech_android/paytech-sdk/build/intermediates/res/merged/release/interpolator-v21/mtrl_fast_out_slow_in.xml",
+        "source": "/Users/macbookretina/.gradle/caches/transforms-2/files-2.1/5d52d9573d8a8f70a8462cc8f8a42ce9/material-1.1.0/res/interpolator-v21/mtrl_fast_out_slow_in.xml"
+    },
+    {
+        "merged": "/Users/macbookretina/PhpstormProjects/docs/downloads/sdk/paytech_android/paytech-sdk/build/intermediates/res/merged/release/interpolator-v21/mtrl_fast_out_linear_in.xml",
+        "source": "/Users/macbookretina/.gradle/caches/transforms-2/files-2.1/5d52d9573d8a8f70a8462cc8f8a42ce9/material-1.1.0/res/interpolator-v21/mtrl_fast_out_linear_in.xml"
+    },
+    {
+        "merged": "/Users/macbookretina/PhpstormProjects/docs/downloads/sdk/paytech_android/paytech-sdk/build/intermediates/res/merged/release/interpolator-v21/mtrl_linear_out_slow_in.xml",
+        "source": "/Users/macbookretina/.gradle/caches/transforms-2/files-2.1/5d52d9573d8a8f70a8462cc8f8a42ce9/material-1.1.0/res/interpolator-v21/mtrl_linear_out_slow_in.xml"
+    }
+]

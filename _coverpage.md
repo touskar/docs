@@ -13,5 +13,26 @@
 [GitHub](https://github.com/paytech-sn)
 [Site officiel](https://paytech.sn)
 
-![color](#1a365d)
+![color](#f0f0f0)
+
+<style>
+.cover-main h1,
+.cover-main h1 a {
+  color: white !important;
+}
+
+.cover-main p,
+.cover-main blockquote {
+  color: white !important;
+}
+
+.cover-main ul li {
+  color: white !important;
+}
+
+.cover-main .buttons a {
+  color: #135571 !important;
+  background: white !important;
+}
+</style>
 
