@@ -1,16 +1,17 @@
 # Transferts PayTech
 
-PayTech propose un système de transfert d'argent qui permet d'envoyer des fonds directement vers les comptes de mobile money des bénéficiaires. Cette section détaille l'utilisation de l'API de transfert et la gestion des notifications IPN.
+PayTech propose un système de transfert d'argent qui permet d'envoyer des fonds directement vers les comptes de mobile money des bénéficiaires. Cette section détaille le fonctionnement des notifications IPN pour les transferts.
 
 ## Vue d'ensemble
 
 Le système de transfert PayTech permet de :
 
-- **Envoyer de l'argent** vers les comptes Orange Money, Wave, Tigo Cash, etc.
 - **Recevoir des notifications IPN** en temps réel sur le statut des transferts
-- **Gérer les échecs** et les tentatives de transfert
+- **Gérer les succès et échecs** de transfert
 - **Suivre les frais** et commissions appliqués
 - **Valider l'authenticité** des notifications avec HMAC ou SHA256
+
+> **⚠️ Important** : PayTech ne fournit pas d'API pour initier des transferts. Les transferts sont initiés depuis le dashboard PayTech et vous recevez uniquement les notifications IPN pour suivre leur statut.
 
 ## Services de transfert supportés
 
@@ -47,46 +48,6 @@ PayTech supporte un large éventail de services de transfert d'argent à travers
 - **Poste Cash** - Service postal de transfert
 - **PayPal** - Transferts PayPal
 
-### Configuration par service
-
-Chaque service a ses propres spécificités :
-
-#### Orange Money (Sénégal)
-- **Service ID** : `ORANGE_MONEY_SN_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : Variables selon le montant
-- **Numéros supportés** : 77xxx xxxx, 78xxx xxxx
-
-#### Wave (Sénégal)
-- **Service ID** : `WAVE_SN_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : 1% du montant transféré
-- **Numéros supportés** : 77xxx xxxx, 78xxx xxxx
-
-#### Tigo Cash (Sénégal)
-- **Service ID** : `TIGO_CASH_SN_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : Variables selon le montant
-- **Numéros supportés** : 76xxx xxxx
-
-#### Orange Money CI (Côte d'Ivoire)
-- **Service ID** : `ORANGE_MONEY_CI_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : Variables selon le montant
-- **Numéros supportés** : Numéros ivoiriens
-
-#### MTN Money CI (Côte d'Ivoire)
-- **Service ID** : `MTN_MONEY_CI_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : Variables selon le montant
-- **Numéros supportés** : Numéros MTN CI
-
-#### Wave CI (Côte d'Ivoire)
-- **Service ID** : `WAVE_CI_API_CASH_IN`
-- **Devise** : XOF (Franc CFA)
-- **Frais** : Variables selon le montant
-- **Numéros supportés** : Numéros ivoiriens
-
 ### Liste complète des services
 
 ```javascript
@@ -115,142 +76,30 @@ const TRANSFER_SERVICES = [
 ];
 ```
 
-## Demande de transfert
+## Notifications IPN pour les transferts
 
-### Endpoint
-```
-POST https://paytech.sn/api/transfer/request
-```
+### ⚠️ Format des données IPN
 
-### Headers requis
-```http
-Content-Type: application/json
-API-KEY: votre_api_key
-API-SECRET: votre_api_secret
-```
+> **🚨 IMPORTANT** : Les notifications IPN de transfert sont envoyées au format **POST URL-encoded**, **PAS en JSON**. Assurez-vous de traiter les données comme des paramètres de formulaire.
 
-### Paramètres de la requête
+### Types d'événements de transfert
 
-| Paramètre | Type | Requis | Description |
-|-----------|------|--------|-------------|
-| `external_id` | string | Oui | Identifiant unique de votre système |
-| `amount` | integer | Oui | Montant en XOF (centimes) |
-| `service_items_id` | string | Oui | ID du service de transfert |
-| `destination_number` | string | Oui | Numéro du bénéficiaire |
-| `env` | string | Oui | Environnement (`test` ou `prod`) |
+PayTech envoie deux types de notifications IPN pour les transferts :
 
-### Exemple de requête
+1. **`transfer_success`** - Transfert réussi
+2. **`transfer_failed`** - Transfert échoué
 
-```bash
-curl -X POST https://paytech.sn/api/transfer/request \
-  -H "Content-Type: application/json" \
-  -H "API-KEY: votre_api_key" \
-  -H "API-SECRET: votre_api_secret" \
-  -d '{
-    "external_id": "TRANSFER_001",
-    "amount": 50000,
-    "service_items_id": "WAVE_SN_API_CASH_IN",
-    "destination_number": "772457199",
-    "env": "test"
-  }'
-```
-
-### Exemple PHP
-
-```php
-<?php
-function requestTransfer($transferData) {
-    $url = 'https://paytech.sn/api/transfer/request';
-    
-    $headers = [
-        'Content-Type: application/json',
-        'API-KEY: ' . PAYTECH_API_KEY,
-        'API-SECRET: ' . PAYTECH_API_SECRET
-    ];
-    
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($transferData));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-    
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    if ($httpCode === 200) {
-        return json_decode($response, true);
-    } else {
-        throw new Exception('Transfer API Error: ' . $response);
-    }
-}
-
-// Exemple d'utilisation
-$transferData = [
-    'external_id' => 'TRANSFER_' . time(),
-    'amount' => 50000, // 500 XOF
-    'service_items_id' => 'WAVE_SN_API_CASH_IN',
-    'destination_number' => '772457199',
-    'env' => 'test'
-];
-
-try {
-    $result = requestTransfer($transferData);
-    echo "Transfert initié: " . $result['id_transfer'];
-} catch (Exception $e) {
-    echo "Erreur: " . $e->getMessage();
-}
-?>
-```
-
-### Réponse de succès
-
-```json
-{
-    "success": true,
-    "id_transfer": "PYT-DEPOT-2QV4WGSULUALINQ8",
-    "external_id": "TRANSFER_001",
-    "amount": 50000,
-    "amount_xof": 50000,
-    "service_name": "Wave Senegal",
-    "destination_number": "772457199",
-    "state": "pending",
-    "fee_percent": 1,
-    "created_at": "2024-03-28T02:08:40.000Z"
-}
-```
-
-## États des transferts
-
-Les transferts peuvent avoir plusieurs états :
-
-| État | Description |
-|------|-------------|
-| `pending` | Transfert en cours de traitement |
-| `processing` | Transfert en cours d'exécution |
-| `success` | Transfert réussi |
-| `failed` | Transfert échoué |
-| `rejected` | Transfert rejeté |
-
-## Notifications de transfert
-
-PayTech envoie des notifications IPN pour informer du statut des transferts.
-
-### Notification de succès
-
-**Type d'événement** : `transfer_success`
+### Structure des données IPN - Transfert réussi
 
 ```json
 {
     "type_event": "transfer_success",
     "created_at": "2024-03-28T02:08:40.000Z",
-    "external_id": "TRANSFER_001",
+    "external_id": "UALI2QV4WGSULNQ8",
     "token_transfer": null,
     "id_transfer": "PYT-DEPOT-2QV4WGSULUALINQ8",
-    "amount": 50000,
-    "amount_xof": 50000,
+    "amount": 500,
+    "amount_xof": 500,
     "service_items_id": "WAVE_SN_API_CASH_IN",
     "service_name": "Wave Senegal",
     "state": "success",
@@ -264,24 +113,22 @@ PayTech envoie des notifications IPN pour informer du statut des transferts.
 }
 ```
 
-### Notification d'échec
-
-**Type d'événement** : `transfer_failed`
+### Structure des données IPN - Transfert échoué
 
 ```json
 {
     "type_event": "transfer_failed",
     "created_at": "2024-03-28T02:08:40.000Z",
-    "external_id": "TRANSFER_001",
+    "external_id": "UALI2QV4WGSULNQ8",
     "token_transfer": null,
     "id_transfer": "PYT-DEPOT-2QV4WGSULUALINQ8",
-    "amount": 50000,
-    "amount_xof": 50000,
+    "amount": 500,
+    "amount_xof": 500,
     "service_items_id": "WAVE_SN_API_CASH_IN",
     "service_name": "Wave Senegal",
     "state": "failed",
     "destination_number": "772457199",
-    "validate_at": "2024-03-28T03:37:12.000Z",
+    "validate_at": null,
     "failed_at": "2024-03-28T03:37:43.000Z",
     "fee_percent": 1,
     "rejected_at": "2024-03-28T03:37:43.000Z",
@@ -290,410 +137,74 @@ PayTech envoie des notifications IPN pour informer du statut des transferts.
 }
 ```
 
-## Traitement des notifications
-
-### Exemple PHP
-
-```php
-<?php
-function handleTransferNotification() {
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        http_response_code(405);
-        exit('Method not allowed');
-    }
-    
-    $input = file_get_contents('php://input');
-    $data = json_decode($input, true);
-    
-    if (!$data) {
-        http_response_code(400);
-        exit('Invalid JSON');
-    }
-    
-    // Valider la signature (recommandé)
-    if (!validateTransferSignature($data)) {
-        http_response_code(400);
-        exit('Invalid signature');
-    }
-    
-    // Traiter selon le type d'événement
-    switch ($data['type_event']) {
-        case 'transfer_success':
-            handleTransferSuccess($data);
-            break;
-            
-        case 'transfer_failed':
-            handleTransferFailure($data);
-            break;
-            
-        default:
-            error_log('Unknown transfer event: ' . $data['type_event']);
-    }
-    
-    // Toujours répondre avec 200 OK
-    http_response_code(200);
-    echo 'OK';
-}
-
-function handleTransferSuccess($data) {
-    // Mettre à jour le statut du transfert dans votre base de données
-    $externalId = $data['external_id'];
-    $transferId = $data['id_transfer'];
-    $amount = $data['amount'];
-    
-    // Exemple de mise à jour
-    updateTransferStatus($externalId, 'success', $transferId);
-    
-    // Notifier l'utilisateur du succès
-    notifyUserTransferSuccess($externalId, $amount);
-    
-    error_log("Transfer success: {$externalId} - {$amount} XOF");
-}
-
-function handleTransferFailure($data) {
-    // Mettre à jour le statut du transfert
-    $externalId = $data['external_id'];
-    $transferId = $data['id_transfer'];
-    
-    // Exemple de mise à jour
-    updateTransferStatus($externalId, 'failed', $transferId);
-    
-    // Notifier l'utilisateur de l'échec
-    notifyUserTransferFailure($externalId);
-    
-    error_log("Transfer failed: {$externalId}");
-}
-
-function validateTransferSignature($data) {
-    // Implémenter la validation de signature
-    // Similaire à la validation des paiements
-    $expectedSignature = calculateTransferSignature($data);
-    return hash_equals($expectedSignature, $data['signature'] ?? '');
-}
-
-// Traiter la notification
-handleTransferNotification();
-?>
-```
-
-### Exemple Node.js
-
-```javascript
-const express = require('express');
-const crypto = require('crypto');
-const app = express();
-
-app.use(express.json());
-
-app.post('/paytech/transfer-notification', (req, res) => {
-    const data = req.body;
-    
-    // Valider la signature
-    if (!validateTransferSignature(data)) {
-        return res.status(400).send('Invalid signature');
-    }
-    
-    // Traiter selon le type d'événement
-    switch (data.type_event) {
-        case 'transfer_success':
-            handleTransferSuccess(data);
-            break;
-            
-        case 'transfer_failed':
-            handleTransferFailure(data);
-            break;
-            
-        default:
-            console.log('Unknown transfer event:', data.type_event);
-    }
-    
-    res.status(200).send('OK');
-});
-
-function handleTransferSuccess(data) {
-    console.log(`Transfer success: ${data.external_id} - ${data.amount} XOF`);
-    
-    // Mettre à jour votre base de données
-    updateTransferStatus(data.external_id, 'success', data.id_transfer);
-    
-    // Notifier l'utilisateur
-    notifyUserTransferSuccess(data.external_id, data.amount);
-}
-
-function handleTransferFailure(data) {
-    console.log(`Transfer failed: ${data.external_id}`);
-    
-    // Mettre à jour votre base de données
-    updateTransferStatus(data.external_id, 'failed', data.id_transfer);
-    
-    // Notifier l'utilisateur
-    notifyUserTransferFailure(data.external_id);
-}
-
-function validateTransferSignature(data) {
-    // Implémenter la validation de signature
-    const expectedSignature = calculateTransferSignature(data);
-    return crypto.timingSafeEqual(
-        Buffer.from(expectedSignature, 'hex'),
-        Buffer.from(data.signature || '', 'hex')
-    );
-}
-
-app.listen(3000, () => {
-    console.log('Transfer notification server running on port 3000');
-});
-```
-
-## Gestion des erreurs
-
-### Codes d'erreur courants
-
-| Code | Description | Solution |
-|------|-------------|----------|
-| `400` | Paramètres invalides | Vérifier les données envoyées |
-| `401` | Authentification échouée | Vérifier les clés API |
-| `403` | Accès refusé | Vérifier les permissions du compte |
-| `404` | Service non trouvé | Vérifier le `service_items_id` |
-| `422` | Numéro invalide | Vérifier le format du numéro |
-| `500` | Erreur serveur | Réessayer plus tard |
-
-### Exemple de gestion d'erreur
-
-```php
-<?php
-try {
-    $result = requestTransfer($transferData);
-    
-    if ($result['success']) {
-        echo "Transfert initié avec succès";
-    } else {
-        echo "Erreur: " . $result['message'];
-    }
-    
-} catch (Exception $e) {
-    // Logger l'erreur
-    error_log("Transfer error: " . $e->getMessage());
-    
-    // Réponse utilisateur
-    echo "Une erreur est survenue lors du transfert";
-}
-?>
-```
-
-## Bonnes pratiques
-
-### Sécurité
-- Toujours valider les signatures des notifications
-- Utiliser HTTPS pour tous les endpoints
-- Ne jamais exposer les clés API côté client
-- Implémenter une authentification pour vos webhooks
-
-### Fiabilité
-- Implémenter un système de retry pour les échecs temporaires
-- Stocker les `external_id` pour éviter les doublons
-- Gérer les timeouts et les erreurs réseau
-- Maintenir un log des transferts pour le debugging
-
-### Performance
-- Traiter les notifications de manière asynchrone
-- Implémenter un système de queue pour les gros volumes
-- Mettre en cache les informations de service
-- Optimiser les requêtes de base de données
-
----
-
-> 💡 **Conseil** : Testez toujours vos transferts en mode sandbox avant de passer en production. Assurez-vous que votre système peut gérer les notifications de succès et d'échec correctement.
-
-
-
-## Notifications IPN pour les transferts
-
-### ⚠️ Format des données IPN
-
-> **🚨 IMPORTANT** : Les notifications IPN de transfert sont envoyées au format **POST URL-encoded**, **PAS en JSON**. Assurez-vous de traiter les données comme des paramètres de formulaire.
-
-### Structure complète des données IPN de transfert
-
-Votre endpoint IPN recevra une requête POST avec la structure suivante pour les transferts :
-
-```json
-{
-  "type_event": "transfer_complete",
-  "custom_field": "",
-  "created_at": "2024-11-06 14:30:25",
-  "external_id": "TRF_20241106_001",
-  "callback_url": "https://votre-site.com/webhooks/paytech/transfer",
-  "token_transfer": "4fe7bb6bedbd94689e89",
-  "id_transfer": "TXN_123456789",
-  "amount": 5000,
-  "amount_xof": 5000,
-  "service_items_id": "WAVE_SN_API_CASH_IN",
-  "service_name": "Wave Sénégal",
-  "state": "success",
-  "destination_number": "221771234567",
-  "validate_at": "2024-11-06 14:31:15",
-  "failed_at": null,
-  "fee_percent": 1.0,
-  "rejected_at": null,
-  "api_key_sha256": "dacbde6382f4bf6ecf4dcec0624712abec1c02b7e5514dad23fdf1242c70d9b5",
-  "api_secret_sha256": "91b1ae073d5edd8f3d71ac2fb88c90018c70c9b30993513de15b1757958ab0d3",
-  "hmac_compute": "a8b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456"
-}
-```
-
 ### Description des champs spécifiques aux transferts
 
 | Champ | Type | Description |
 |-------|------|-------------|
-| `type_event` | string | Type d'événement : "transfer_complete" |
-| `external_id` | string | Identifiant unique de votre système |
-| `token_transfer` | string | Token unique du transfert |
-| `id_transfer` | string | ID de transaction PayTech |
+| `type_event` | string | Type d'événement : "transfer_success" ou "transfer_failed" |
+| `created_at` | string | Date de création du transfert (ISO 8601) |
+| `external_id` | string | Identifiant externe du transfert |
+| `token_transfer` | string/null | Token du transfert (peut être null) |
+| `id_transfer` | string | ID unique du transfert PayTech |
 | `amount` | number | Montant du transfert |
 | `amount_xof` | number | Montant en XOF |
-| `service_items_id` | string | ID du service utilisé |
-| `service_name` | string | Nom du service (Wave, Orange Money, etc.) |
-| `state` | string | Statut : "success", "failed", "pending" |
+| `service_items_id` | string | ID du service utilisé (ex: WAVE_SN_API_CASH_IN) |
+| `service_name` | string | Nom du service (ex: Wave Senegal) |
+| `state` | string | Statut : "success" ou "failed" |
 | `destination_number` | string | Numéro de téléphone du bénéficiaire |
-| `validate_at` | string | Date de validation (si succès) |
-| `failed_at` | string | Date d'échec (si échec) |
+| `validate_at` | string/null | Date de validation (si succès) |
+| `failed_at` | string/null | Date d'échec (si échec) |
 | `fee_percent` | number | Pourcentage de frais appliqué |
-| `rejected_at` | string | Date de rejet (si rejeté) |
+| `rejected_at` | string/null | Date de rejet (si rejeté) |
+| `api_key_sha256` | string | Hash SHA256 de votre API_KEY |
+| `api_secret_sha256` | string | Hash SHA256 de votre API_SECRET |
 
 ## Validation des notifications IPN de transfert
 
 PayTech propose **deux méthodes de validation** pour les transferts :
 
-### Méthode 1 : Validation HMAC (Recommandée)
+### Méthode 1 : Validation SHA256 (Standard)
 
-La signature HMAC pour les transferts utilise la formule :
-```
-message = amount|id_transfer|api_key
-signature = HMAC-SHA256(message, api_secret)
-```
-
-#### Implémentation PHP pour transferts
+Pour garantir que la notification provient bien de PayTech, validez les hash SHA256 des clés API :
 
 ```php
 <?php
-function generateHMACSHA256($message, $secretKey) {
-    try {
-        return hash_hmac('sha256', $message, $secretKey);
-    } catch (Exception $e) {
-        error_log("HMAC Error: " . $e->getMessage());
-        return false;
-    }
-}
-
-function validateTransferIPNWithHMAC($requestData, $apiKey, $apiSecret) {
-    // Récupération des données nécessaires
-    $amount = $requestData['amount'];
-    $idTransfer = $requestData['id_transfer'];
-    $receivedHmac = $requestData['hmac_compute'];
-    
-    if (!$amount || !$idTransfer || !$receivedHmac) {
-        return false;
-    }
-    
-    // Construction du message pour HMAC
-    $message = $amount . '|' . $idTransfer . '|' . $apiKey;
-    
-    // Génération de la signature attendue
-    $expectedHmac = generateHMACSHA256($message, $apiSecret);
-    
-    // Comparaison sécurisée
-    return hash_equals($expectedHmac, $receivedHmac);
-}
-?>
-```
-
-#### Implémentation Node.js pour transferts
-
-```javascript
-const crypto = require('crypto');
-
-function generateHMACSHA256(message, secretKey) {
-    try {
-        const hmac = crypto.createHmac('sha256', secretKey);
-        hmac.update(message);
-        return hmac.digest('hex');
-    } catch (e) {
-        console.log(e);
-        return e.message;
-    }
-}
-
-function validateTransferIPNWithHMAC(requestData, apiKey, apiSecret) {
-    const { amount, id_transfer, hmac_compute } = requestData;
-    
-    if (!amount || !id_transfer || !hmac_compute) {
-        return false;
-    }
-    
-    // Construction du message
-    const message = `${amount}|${id_transfer}|${apiKey}`;
-    
-    // Génération de la signature attendue
-    const expectedHmac = generateHMACSHA256(message, apiSecret);
-    
-    // Comparaison sécurisée
-    return crypto.timingSafeEqual(
-        Buffer.from(expectedHmac, 'hex'),
-        Buffer.from(hmac_compute, 'hex')
-    );
-}
-```
-
-#### Implémentation Python pour transferts
-
-```python
-import hmac
-import hashlib
-
-def generate_hmac_sha256(message, secret_key):
-    try:
-        return hmac.new(
-            secret_key.encode('utf-8'),
-            message.encode('utf-8'),
-            hashlib.sha256
-        ).hexdigest()
-    except Exception as e:
-        print(f"HMAC Error: {e}")
-        return None
-
-def validate_transfer_ipn_with_hmac(request_data, api_key, api_secret):
-    amount = request_data.get('amount')
-    id_transfer = request_data.get('id_transfer')
-    received_hmac = request_data.get('hmac_compute')
-    
-    if not all([amount, id_transfer, received_hmac]):
-        return False
-    
-    # Construction du message
-    message = f"{amount}|{id_transfer}|{api_key}"
-    
-    # Génération de la signature attendue
-    expected_hmac = generate_hmac_sha256(message, api_secret)
-    
-    # Comparaison sécurisée
-    return hmac.compare_digest(expected_hmac, received_hmac)
-```
-
-### Méthode 2 : Validation SHA256 (Alternative)
-
-Si vous préférez utiliser la validation par hash SHA256 :
-
-```php
-<?php
-function validateTransferIPNWithSHA256($requestData, $apiKey, $apiSecret) {
-    $receivedApiKeyHash = $requestData['api_key_sha256'] ?? '';
-    $receivedSecretHash = $requestData['api_secret_sha256'] ?? '';
+function validateTransferIPNFromPayTech($requestData, $apiKey, $apiSecret) {
+    $receivedApiKeyHash = $requestData['api_key_sha256'];
+    $receivedSecretHash = $requestData['api_secret_sha256'];
     
     $expectedApiKeyHash = hash('sha256', $apiKey);
     $expectedSecretHash = hash('sha256', $apiSecret);
     
     return ($receivedApiKeyHash === $expectedApiKeyHash && 
             $receivedSecretHash === $expectedSecretHash);
+}
+?>
+```
+
+### Méthode 2 : Validation HMAC (Si disponible)
+
+Si le champ `hmac_compute` est présent, utilisez la validation HMAC :
+
+```php
+<?php
+function validateTransferIPNWithHMAC($requestData, $apiKey, $apiSecret) {
+    if (!isset($requestData['hmac_compute'])) {
+        return false;
+    }
+    
+    $amount = $requestData['amount'];
+    $idTransfer = $requestData['id_transfer'];
+    $receivedHmac = $requestData['hmac_compute'];
+    
+    // Construction du message pour HMAC
+    $message = $amount . '|' . $idTransfer . '|' . $apiKey;
+    
+    // Génération de la signature attendue
+    $expectedHmac = hash_hmac('sha256', $message, $apiSecret);
+    
+    // Comparaison sécurisée
+    return hash_equals($expectedHmac, $receivedHmac);
 }
 ?>
 ```
@@ -712,7 +223,7 @@ function validateTransferIPN($requestData, $apiKey, $apiSecret) {
     
     // Fallback sur la validation SHA256
     if (isset($requestData['api_key_sha256']) && isset($requestData['api_secret_sha256'])) {
-        $isValid = validateTransferIPNWithSHA256($requestData, $apiKey, $apiSecret);
+        $isValid = validateTransferIPNFromPayTech($requestData, $apiKey, $apiSecret);
         error_log('Transfer SHA256 validation: ' . ($isValid ? 'VALID' : 'INVALID'));
         return $isValid;
     }
@@ -774,7 +285,7 @@ try {
     }
     
     // Vérification du type d'événement
-    if ($data['type_event'] !== 'transfer_complete') {
+    if (!in_array($data['type_event'], ['transfer_success', 'transfer_failed'])) {
         logTransferIPN('Error: Unknown event type', $data['type_event']);
         http_response_code(400);
         exit('Unknown event type');
@@ -787,28 +298,27 @@ try {
     $serviceName = $data['service_name'];
     $destinationNumber = $data['destination_number'];
     $idTransfer = $data['id_transfer'];
+    $typeEvent = $data['type_event'];
     
-    // Traitement selon le statut
+    // Traitement selon le type d'événement
     $success = false;
-    switch ($state) {
-        case 'success':
+    switch ($typeEvent) {
+        case 'transfer_success':
             $success = processTransferSuccess($externalId, $amount, $serviceName, $destinationNumber, $data);
             break;
-        case 'failed':
+        case 'transfer_failed':
             $success = processTransferFailure($externalId, $data['failed_at'], $data);
             break;
-        case 'pending':
-            $success = processTransferPending($externalId, $data);
-            break;
         default:
-            logTransferIPN('Error: Unknown transfer state', $state);
+            logTransferIPN('Error: Unknown transfer event type', $typeEvent);
             http_response_code(400);
-            exit('Unknown transfer state');
+            exit('Unknown transfer event type');
     }
     
     if ($success) {
         logTransferIPN('Success: Transfer processed', [
             'external_id' => $externalId,
+            'type_event' => $typeEvent,
             'state' => $state,
             'id_transfer' => $idTransfer
         ]);
@@ -861,7 +371,7 @@ function processTransferSuccess($externalId, $amount, $serviceName, $destination
             SET status = 'completed',
                 service_name = ?,
                 destination_number = ?,
-                completed_at = NOW(),
+                completed_at = ?,
                 paytech_data = ?
             WHERE external_id = ?
         ");
@@ -871,10 +381,17 @@ function processTransferSuccess($externalId, $amount, $serviceName, $destination
             'token_transfer' => $fullData['token_transfer'],
             'validate_at' => $fullData['validate_at'],
             'fee_percent' => $fullData['fee_percent'],
-            'service_items_id' => $fullData['service_items_id']
+            'service_items_id' => $fullData['service_items_id'],
+            'type_event' => $fullData['type_event']
         ]);
         
-        $stmt->execute([$serviceName, $destinationNumber, $paytechData, $externalId]);
+        $stmt->execute([
+            $serviceName, 
+            $destinationNumber, 
+            $fullData['validate_at'], 
+            $paytechData, 
+            $externalId
+        ]);
         
         // Actions post-transfert (notifications, etc.)
         triggerPostTransferActions($transfer['id'], 'success');
@@ -896,6 +413,7 @@ function processTransferFailure($externalId, $failedAt, $fullData) {
             UPDATE transfers 
             SET status = 'failed',
                 failed_at = ?,
+                rejected_at = ?,
                 paytech_data = ?
             WHERE external_id = ?
         ");
@@ -903,41 +421,20 @@ function processTransferFailure($externalId, $failedAt, $fullData) {
         $paytechData = json_encode([
             'id_transfer' => $fullData['id_transfer'],
             'failed_at' => $failedAt,
+            'rejected_at' => $fullData['rejected_at'],
+            'type_event' => $fullData['type_event'],
             'reason' => 'Transfer failed on PayTech side'
         ]);
         
-        $stmt->execute([$failedAt, $paytechData, $externalId]);
+        $stmt->execute([
+            $failedAt, 
+            $fullData['rejected_at'], 
+            $paytechData, 
+            $externalId
+        ]);
         
         // Actions post-échec (notifications, remboursement, etc.)
         triggerPostTransferActions($externalId, 'failed');
-        
-        return true;
-        
-    } catch (PDOException $e) {
-        logTransferIPN('Database error: ' . $e->getMessage());
-        return false;
-    }
-}
-
-function processTransferPending($externalId, $fullData) {
-    try {
-        $pdo = new PDO('mysql:host=localhost;dbname=votre_db', 'user', 'password');
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        $stmt = $pdo->prepare("
-            UPDATE transfers 
-            SET status = 'pending',
-                paytech_data = ?
-            WHERE external_id = ?
-        ");
-        
-        $paytechData = json_encode([
-            'id_transfer' => $fullData['id_transfer'],
-            'updated_at' => date('Y-m-d H:i:s'),
-            'status' => 'pending'
-        ]);
-        
-        $stmt->execute([$paytechData, $externalId]);
         
         return true;
         
@@ -956,15 +453,203 @@ function triggerPostTransferActions($transferId, $status) {
 ?>
 ```
 
+## Exemples d'intégration
+
+### Node.js Express
+
+```javascript
+const express = require('express');
+const crypto = require('crypto');
+
+const app = express();
+app.use(express.urlencoded({ extended: true })); // Pour POST URL-encoded
+
+// Configuration
+const PAYTECH_API_KEY = process.env.PAYTECH_API_KEY;
+const PAYTECH_API_SECRET = process.env.PAYTECH_API_SECRET;
+
+// Validation SHA256
+function validateTransferIPN(data) {
+    const receivedApiKeyHash = data.api_key_sha256;
+    const receivedSecretHash = data.api_secret_sha256;
+    
+    const expectedApiKeyHash = crypto.createHash('sha256')
+        .update(PAYTECH_API_KEY)
+        .digest('hex');
+    const expectedSecretHash = crypto.createHash('sha256')
+        .update(PAYTECH_API_SECRET)
+        .digest('hex');
+    
+    return (receivedApiKeyHash === expectedApiKeyHash && 
+            receivedSecretHash === expectedSecretHash);
+}
+
+// Endpoint IPN transferts
+app.post('/webhooks/paytech/transfer', (req, res) => {
+    try {
+        const data = req.body;
+        
+        console.log('Transfer IPN Received:', JSON.stringify(data, null, 2));
+        
+        // Validation de l'authenticité
+        if (!validateTransferIPN(data)) {
+            console.error('Transfer IPN Error: Invalid authentication');
+            return res.status(403).send('IPN KO NOT FROM PAYTECH');
+        }
+        
+        // Vérification du type d'événement
+        if (!['transfer_success', 'transfer_failed'].includes(data.type_event)) {
+            console.error('Transfer IPN Error: Unknown event type', data.type_event);
+            return res.status(400).send('Unknown event type');
+        }
+        
+        // Traitement selon le type
+        if (data.type_event === 'transfer_success') {
+            processTransferSuccess(data);
+        } else if (data.type_event === 'transfer_failed') {
+            processTransferFailure(data);
+        }
+        
+        console.log('Transfer IPN processed successfully');
+        res.status(200).send('IPN OK');
+        
+    } catch (error) {
+        console.error('Transfer IPN Error:', error.message);
+        res.status(500).send('Internal error');
+    }
+});
+
+function processTransferSuccess(data) {
+    console.log(`Transfer ${data.external_id} completed successfully`);
+    console.log(`Amount: ${data.amount} XOF to ${data.destination_number}`);
+    console.log(`Service: ${data.service_name}`);
+    
+    // Votre logique métier ici
+    // - Mettre à jour la base de données
+    // - Envoyer des notifications
+    // - Déclencher des webhooks
+}
+
+function processTransferFailure(data) {
+    console.log(`Transfer ${data.external_id} failed`);
+    console.log(`Failed at: ${data.failed_at}`);
+    console.log(`Rejected at: ${data.rejected_at}`);
+    
+    // Votre logique métier ici
+    // - Mettre à jour la base de données
+    // - Notifier l'utilisateur
+    // - Gérer les remboursements
+}
+
+app.listen(3000, () => {
+    console.log('Transfer IPN server listening on port 3000');
+});
+```
+
+### Python Django
+
+```python
+import json
+import hashlib
+import hmac
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
+
+def validate_transfer_ipn(data):
+    """Valide l'authenticité d'une notification IPN de transfert"""
+    received_api_key_hash = data.get('api_key_sha256', '')
+    received_secret_hash = data.get('api_secret_sha256', '')
+    
+    expected_api_key_hash = hashlib.sha256(
+        settings.PAYTECH_API_KEY.encode()
+    ).hexdigest()
+    expected_secret_hash = hashlib.sha256(
+        settings.PAYTECH_SECRET_KEY.encode()
+    ).hexdigest()
+    
+    return (received_api_key_hash == expected_api_key_hash and 
+            received_secret_hash == expected_secret_hash)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def transfer_ipn_webhook(request):
+    """Endpoint pour recevoir les notifications IPN de transfert"""
+    try:
+        # Récupération des données POST
+        data = request.POST.dict()
+        
+        logger.info(f'Transfer IPN Received: {json.dumps(data, indent=2)}')
+        
+        # Validation de l'authenticité
+        if not validate_transfer_ipn(data):
+            logger.error('Transfer IPN Error: Invalid authentication')
+            return HttpResponse('IPN KO NOT FROM PAYTECH', status=403)
+        
+        # Vérification du type d'événement
+        type_event = data.get('type_event')
+        if type_event not in ['transfer_success', 'transfer_failed']:
+            logger.error(f'Transfer IPN Error: Unknown event type {type_event}')
+            return HttpResponse('Unknown event type', status=400)
+        
+        # Traitement selon le type
+        if type_event == 'transfer_success':
+            process_transfer_success(data)
+        elif type_event == 'transfer_failed':
+            process_transfer_failure(data)
+        
+        logger.info('Transfer IPN processed successfully')
+        return HttpResponse('IPN OK', status=200)
+        
+    except Exception as e:
+        logger.error(f'Transfer IPN Error: {str(e)}')
+        return HttpResponse('Internal error', status=500)
+
+def process_transfer_success(data):
+    """Traite un transfert réussi"""
+    external_id = data.get('external_id')
+    amount = data.get('amount')
+    destination_number = data.get('destination_number')
+    service_name = data.get('service_name')
+    
+    logger.info(f'Transfer {external_id} completed successfully')
+    logger.info(f'Amount: {amount} XOF to {destination_number}')
+    logger.info(f'Service: {service_name}')
+    
+    # Votre logique métier ici
+    # - Mettre à jour le modèle Transfer
+    # - Envoyer des notifications
+    # - Déclencher des tâches asynchrones
+
+def process_transfer_failure(data):
+    """Traite un transfert échoué"""
+    external_id = data.get('external_id')
+    failed_at = data.get('failed_at')
+    rejected_at = data.get('rejected_at')
+    
+    logger.info(f'Transfer {external_id} failed')
+    logger.info(f'Failed at: {failed_at}')
+    logger.info(f'Rejected at: {rejected_at}')
+    
+    # Votre logique métier ici
+    # - Mettre à jour le statut
+    # - Notifier l'utilisateur
+    # - Gérer les remboursements
+```
+
 ## Bonnes pratiques pour les IPN de transfert
 
 ### Sécurité
 
-1. **Toujours valider** l'authenticité avec HMAC ou SHA256
+1. **Toujours valider** l'authenticité avec SHA256 ou HMAC
 2. **Utiliser HTTPS** pour toutes les URLs IPN
 3. **Désactiver CSRF** pour les endpoints IPN
 4. **Logger toutes** les notifications reçues
-5. **Vérifier les montants** avant traitement
+5. **Vérifier les montants** et identifiants
 
 ### Performance
 
@@ -980,5 +665,12 @@ function triggerPostTransferActions($transferId, $status) {
 3. **Logs détaillés** pour le débogage
 4. **Surveillance** des temps de réponse
 
-Le système de transfert PayTech avec notifications IPN offre une solution complète pour gérer les transferts d'argent avec une validation sécurisée et un suivi en temps réel des statuts.
+### Gestion des erreurs
+
+1. **Retry automatique** pour les échecs temporaires
+2. **Dead letter queue** pour les échecs persistants
+3. **Notification admin** sur les erreurs critiques
+4. **Fallback** sur validation alternative
+
+Le système de transfert PayTech avec notifications IPN offre une solution complète pour suivre les transferts d'argent avec une validation sécurisée et un monitoring en temps réel des statuts.
 
