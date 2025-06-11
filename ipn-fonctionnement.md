@@ -2,6 +2,34 @@
 
 Le système IPN (Instant Payment Notification) de PayTech permet à votre serveur de recevoir des notifications en temps réel lorsqu'un paiement est confirmé. Cette section explique le fonctionnement complet du système IPN et son implémentation.
 
+## ⚠️ Notes importantes
+
+### Format des données IPN
+
+> **🚨 CRITIQUE** : Les notifications IPN sont envoyées au format **POST URL-encoded**, **PAS en JSON**. Assurez-vous de traiter les données comme des paramètres de formulaire classiques.
+
+### Sécurité et authentification
+
+> **🔒 IMPORTANT** : Désactivez toute vérification de token CSRF et d'authentification sur votre URL IPN. PayTech doit pouvoir accéder à cette URL sans restriction pour envoyer les notifications.
+
+```php
+// Exemple PHP - Désactiver CSRF pour l'IPN
+if (strpos($_SERVER['REQUEST_URI'], '/webhooks/paytech') !== false) {
+    // Désactiver la vérification CSRF pour cette route
+    config(['app.csrf_protection' => false]);
+}
+```
+
+```python
+# Exemple Django - Désactiver CSRF pour l'IPN
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def paytech_ipn(request):
+    # Traitement IPN sans vérification CSRF
+    pass
+```
+
 ## Qu'est-ce que l'IPN ?
 
 L'IPN (Instant Payment Notification) est un système de notification automatique qui informe votre serveur du statut d'un paiement dès que celui-ci est traité par PayTech. Contrairement aux redirections utilisateur qui peuvent être interrompues, l'IPN garantit que votre système sera notifié même si l'utilisateur ferme son navigateur.
@@ -98,7 +126,12 @@ Votre endpoint IPN recevra une requête POST avec les données suivantes :
 
 ## Validation de l'authenticité
 
-### Principe de validation
+PayTech propose **deux méthodes de validation** pour vérifier l'authenticité des notifications IPN :
+
+1. **Validation par hash SHA256** (méthode classique)
+2. **Validation par signature HMAC** (méthode recommandée)
+
+### Méthode 1 : Validation par hash SHA256
 
 Pour garantir que la notification provient bien de PayTech, vous devez valider les hash SHA256 des clés API :
 
@@ -113,6 +146,163 @@ function validateIPNFromPayTech($requestData, $apiKey, $apiSecret) {
     
     return ($receivedApiKeyHash === $expectedApiKeyHash && 
             $receivedSecretHash === $expectedSecretHash);
+}
+?>
+```
+
+### Méthode 2 : Validation par signature HMAC (Recommandée)
+
+PayTech inclut également un champ `hmac_compute` qui contient une signature HMAC pour une sécurité renforcée.
+
+#### Structure de la signature HMAC
+
+La signature HMAC est générée avec la formule suivante :
+```
+message = amount|id_transaction|api_key
+signature = HMAC-SHA256(message, api_secret)
+```
+
+#### Exemple de données IPN avec HMAC
+
+```json
+{
+  "type_event": "sale_complete",
+  "amount": 5000,
+  "id_transaction": "TXN_123456789",
+  "token": "4fe7bb6bedbd94689e89",
+  "api_key_sha256": "dacbde6382f4bf6ecf4dcec0624712abec1c02b7e5514dad23fdf1242c70d9b5",
+  "api_secret_sha256": "91b1ae073d5edd8f3d71ac2fb88c90018c70c9b30993513de15b1757958ab0d3",
+  "hmac_compute": "a8b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456"
+}
+```
+
+#### Implémentation de la validation HMAC
+
+```php
+<?php
+function generateHMACSHA256($message, $secretKey) {
+    return hash_hmac('sha256', $message, $secretKey);
+}
+
+function validateIPNWithHMAC($requestData, $apiKey, $apiSecret) {
+    // Récupération des données nécessaires
+    $amount = $requestData['amount'];
+    $idTransaction = $requestData['id_transaction'];
+    $receivedHmac = $requestData['hmac_compute'];
+    
+    // Construction du message pour HMAC
+    $message = $amount . '|' . $idTransaction . '|' . $apiKey;
+    
+    // Génération de la signature attendue
+    $expectedHmac = generateHMACSHA256($message, $apiSecret);
+    
+    // Comparaison sécurisée
+    return hash_equals($expectedHmac, $receivedHmac);
+}
+
+// Fonction de validation combinée (HMAC + SHA256)
+function validateIPNSecurity($requestData, $apiKey, $apiSecret) {
+    // Validation HMAC (recommandée)
+    if (isset($requestData['hmac_compute'])) {
+        return validateIPNWithHMAC($requestData, $apiKey, $apiSecret);
+    }
+    
+    // Fallback sur validation SHA256
+    return validateIPNFromPayTech($requestData, $apiKey, $apiSecret);
+}
+?>
+```
+
+#### Exemple Node.js pour HMAC
+
+```javascript
+const crypto = require('crypto');
+
+function generateHMACSHA256(message, secretKey) {
+    try {
+        const hmac = crypto.createHmac('sha256', secretKey);
+        hmac.update(message);
+        return hmac.digest('hex');
+    } catch (e) {
+        console.log(e);
+        return e.message;
+    }
+}
+
+function validateIPNWithHMAC(requestData, apiKey, apiSecret) {
+    const { amount, id_transaction, hmac_compute } = requestData;
+    
+    // Construction du message
+    const message = `${amount}|${id_transaction}|${apiKey}`;
+    
+    // Génération de la signature attendue
+    const expectedHmac = generateHMACSHA256(message, apiSecret);
+    
+    // Comparaison sécurisée
+    return crypto.timingSafeEqual(
+        Buffer.from(expectedHmac, 'hex'),
+        Buffer.from(hmac_compute, 'hex')
+    );
+}
+```
+
+#### Exemple Python pour HMAC
+
+```python
+import hmac
+import hashlib
+
+def generate_hmac_sha256(message, secret_key):
+    try:
+        return hmac.new(
+            secret_key.encode('utf-8'),
+            message.encode('utf-8'),
+            hashlib.sha256
+        ).hexdigest()
+    except Exception as e:
+        print(f"HMAC Error: {e}")
+        return None
+
+def validate_ipn_with_hmac(request_data, api_key, api_secret):
+    amount = request_data.get('amount')
+    id_transaction = request_data.get('id_transaction')
+    received_hmac = request_data.get('hmac_compute')
+    
+    if not all([amount, id_transaction, received_hmac]):
+        return False
+    
+    # Construction du message
+    message = f"{amount}|{id_transaction}|{api_key}"
+    
+    # Génération de la signature attendue
+    expected_hmac = generate_hmac_sha256(message, api_secret)
+    
+    # Comparaison sécurisée
+    return hmac.compare_digest(expected_hmac, received_hmac)
+```
+
+### Choix de la méthode de validation
+
+```php
+<?php
+// Exemple d'implémentation flexible
+function validateIPN($requestData, $apiKey, $apiSecret) {
+    // Priorité à la validation HMAC si disponible
+    if (isset($requestData['hmac_compute']) && !empty($requestData['hmac_compute'])) {
+        $isValid = validateIPNWithHMAC($requestData, $apiKey, $apiSecret);
+        logIPN('HMAC validation result: ' . ($isValid ? 'VALID' : 'INVALID'));
+        return $isValid;
+    }
+    
+    // Fallback sur la validation SHA256
+    if (isset($requestData['api_key_sha256']) && isset($requestData['api_secret_sha256'])) {
+        $isValid = validateIPNFromPayTech($requestData, $apiKey, $apiSecret);
+        logIPN('SHA256 validation result: ' . ($isValid ? 'VALID' : 'INVALID'));
+        return $isValid;
+    }
+    
+    logIPN('No validation method available');
+    return false;
 }
 ?>
 ```
