@@ -2,6 +2,7 @@
 
 - **Introduction**
   - [Présentation générale](introduction.md)
+  - [SDK et téléchargements](sdk-telechargements.md)
   - [Dépôts officiels](depots.md)
   - [URL de base](url-base.md)
   - [Clés API](cles-api.md)

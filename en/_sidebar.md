@@ -2,6 +2,7 @@
 
 - **Introduction**
   - [Overview](en/introduction.md)
+  - [SDKs and downloads](en/sdk-downloads.md)
   - [Official repositories](en/repositories.md)
   - [Base URL](en/base-url.md)
   - [API Keys](en/cles-api.md)
