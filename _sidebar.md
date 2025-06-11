@@ -19,6 +19,7 @@
   - [Node.js](serveur-nodejs.md)
   - [PHP](serveur-php.md)
   - [Python](serveur-python.md)
+  - [Python avancé](python-avance.md)
   - [Java](serveur-java.md)
 
 - **Intégration côté client**

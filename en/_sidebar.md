@@ -19,6 +19,7 @@
   - [Node.js](en/server-nodejs.md)
   - [PHP](en/server-php.md)
   - [Python](en/server-python.md)
+  - [Python advanced](en/python-advanced.md)
   - [Java](en/server-java.md)
 
 - **Client-side integration**
