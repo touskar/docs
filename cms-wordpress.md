@@ -4,27 +4,30 @@ Guide d'intégration PayTech pour WordPress et WooCommerce.
 
 ## 📦 Installation
 
+### Téléchargement
+
+**PayTech WooCommerce v6.0.3** - Mise à jour du 07 Avril 2025 12H02  
+[Télécharger paytech_woocommerce.zip]({{DOWNLOAD_URL}}/woocomerce/paytech_woocommerce.zip?v=6.0.3)
+
 ### Méthode 1 : Via l'admin WordPress
 
-1. **Téléchargez** le plugin depuis le dashboard PayTech
+1. **Téléchargez** le plugin depuis le lien ci-dessus
 2. **Connectez-vous** à votre admin WordPress
 3. **Allez** dans Extensions > Ajouter
 4. **Cliquez** sur "Téléverser une extension"
-5. **Sélectionnez** le fichier `paytech-woocommerce.zip`
+5. **Sélectionnez** le fichier `paytech_woocommerce.zip`
 6. **Cliquez** sur "Installer maintenant"
 7. **Activez** l'extension
 
-### Méthode 2 : Téléchargement direct
-
-[Télécharger PayTech WooCommerce v6.0.3](/downloads/sdk/woocomerce/paytech_woocommerce.zip?v=6.0.3)
-
-### Méthode 3 : Via FTP
+### Méthode 2 : Via FTP
 
 1. **Téléchargez** et **décompressez** le plugin
 2. **Uploadez** le dossier `paytech-woocommerce` dans `/wp-content/plugins/`
 3. **Activez** le plugin depuis l'admin WordPress
 
 ## ⚙️ Configuration
+
+> ✅ **Important** : Le plugin PayTech WooCommerce gère **automatiquement** les notifications IPN. Vous n'avez pas besoin de configurer manuellement les webhooks ou les endpoints IPN. Il suffit d'installer le plugin et de renseigner vos clés API.
 
 ### 1. Accès aux paramètres
 

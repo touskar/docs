@@ -331,6 +331,12 @@
 
   <div id="app">Chargement...</div>
   <script>
+    // Configuration globale PayTech
+    window.PAYTECH_CONFIG = {
+      BASE_URL: window.location.origin, // Utilise automatiquement le domaine actuel
+      DOWNLOADS_PATH: '/downloads/sdk'
+    };
+
     window.$docsify = {
       name: 'PayTech API',
       repo: '',
@@ -400,11 +406,18 @@
       },
       plugins: [
         function(hook, vm) {
+          // Plugin pour remplacer les liens de téléchargement
           hook.beforeEach(function (html) {
-            var url = 'https://github.com/touskar/docs/blob/main/' + vm.route.file
-            var editHtml = '[:memo: Modifier ce document](' + url + ')\n'
-            return editHtml + html
-          })
+            // Remplacer les liens de téléchargement avec la configuration
+            html = html.replace(/\[([^\]]+)\]\({{DOWNLOAD_URL}}([^)]+)\)/g, function(match, text, path) {
+              return `[${text}](${window.PAYTECH_CONFIG.BASE_URL}${window.PAYTECH_CONFIG.DOWNLOADS_PATH}${path})`;
+            });
+            
+            // Ajouter le lien d'édition
+            var url = 'https://github.com/touskar/docs/blob/main/' + vm.route.file;
+            var editHtml = '[:memo: Modifier ce document](' + url + ')\n';
+            return editHtml + html;
+          });
         }
       ]
     }
