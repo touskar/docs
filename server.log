@@ -1,0 +1,67 @@
+127.0.0.1 - - [14/Jun/2025 20:53:26] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:26] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:28] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:28] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:30] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:30] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:34] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [14/Jun/2025 20:53:34] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:34] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:38] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:38] "POST / HTTP/1.1" 501 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET / HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /README.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /favicon.ico HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /_sidebar.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /sdk-telechargements.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /introduction.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /depots.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /url-base.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /paiement.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /cles-api.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /paiement-redirection.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /demande-paiement.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /securite-signatures.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /serveur-php.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /serveur-nodejs.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /serveur-python.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /serveur-laravel.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /serveur-java.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /transferts.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /client-web.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /python-avance.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /ipn-exemples.md HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /transferts-notifications.md HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /ipn-utilisation.md HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /cms-drupal.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /mobile-flutter.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /mobile-android.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /support.md HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /cms-prestashop.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /mobile-ios.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /cms-wordpress.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /client-vue.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /mobile-react-native.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /codes-erreur.md HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /client-react.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /ipn-fonctionnement.md HTTP/1.1" 200 -
+10.236.67.1 - - [14/Jun/2025 20:53:45] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:45] "GET /changelog.md HTTP/1.1" 404 -
+10.236.67.1 - - [14/Jun/2025 20:53:46] code 404, message File not found
+10.236.67.1 - - [14/Jun/2025 20:53:46] "GET /faq.md HTTP/1.1" 404 -
+127.0.0.1 - - [14/Jun/2025 20:53:46] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:46] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:48] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:48] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:52] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:52] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:54] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:54] "POST / HTTP/1.1" 501 -
+127.0.0.1 - - [14/Jun/2025 20:53:58] code 501, message Unsupported method ('POST')
+127.0.0.1 - - [14/Jun/2025 20:53:58] "POST / HTTP/1.1" 501 -
